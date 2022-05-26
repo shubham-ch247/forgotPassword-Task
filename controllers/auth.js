@@ -1,19 +1,21 @@
 const userModelSchema = require("../model/user");
+const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken");
 const { Email } = require("../utils/Email");
 //signup user
 const signup = async (req, res) => {
   try {
     const { firstName, lastName, email, password } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
     const user = await userModelSchema.findOne({ email: email });
     if (user) {
       throw new Error("email already exist", 422);
     }
     const newUser = await userModelSchema.create({
-      firstName,
-      lastName,
-      email,
-      password,
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+      password: hashedPassword,
     });
     return res.status(200).json({
       registerUser: newUser,
@@ -26,17 +28,17 @@ const signup = async (req, res) => {
 };
 
 // forgot password page action
-const forgotPasswordAction = async (req, res, next) => {
+const forgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
     const user = await userModelSchema.findOne({ email: email });
     // set the secret with jwt token + password
-    const secret = process.env.JWT_SECRET + user.password;
+    const secret = process.env.jwt_secret + user.password;
     const payLoad = {
       email: user.email,
       id: user._id,
     };
-    const token = jwt.sign(payLoad, secret);
+    const token = jwt.sign(payLoad, secret, { expiresIn: '60m' });
     const link = `http://localhost:8080/user/newpassword/${user._id}/${token}`;
     // send email to set the new password
     const emailClient = new Email();
@@ -55,15 +57,10 @@ const forgotPasswordAction = async (req, res, next) => {
   }
 };
 
-const newPassword = async (req, res, next) => {
+const verifyLink = async (req, res, next) => {
   const { id, token } = req.params;
-  const user = await userModelSchema.findOne({ id });
-  // check if this id exist in database
-  if (id !== user.id) {
-    return res.send("invalid User Id...");
-  }
-  // we have a valid id, and we have a valid user with this id
-  const secret = process.env.JWT_SECRET + user.password;
+  const user = await userModelSchema.findOne({ _id: id});
+  const secret = process.env.jwt_secret + user.password;
   try {
     const payLoad = jwt.verify(token, secret);
 
@@ -72,20 +69,17 @@ const newPassword = async (req, res, next) => {
     });
   } catch (error) {
     return res.status(500).json({
-      message: "invalid link, Try again later !!",
+      message: "link expired, Try again later !!",
     });
   }
 };
 
-const newPasswordAction = async (req, res, next) => {
+const newPassword = async (req, res, next) => {
   const { id, token } = req.params;
   const { password, cpassword } = req.body;
-  const user = await userModelSchema.findOne({ id });
-  // check if this id exist in database
-  if (id !== user.id) {
-    return res.send("invalid User Id...");
-  }
-  const secret = process.env.JWT_SECRET + user.password;
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const user = await userModelSchema.findOne({ _id: id });
+  const secret = process.env.jwt_secret + user.password;
   try {
     const payLoad = jwt.verify(token, secret);
     // validate password and confirm password should match
@@ -93,7 +87,7 @@ const newPasswordAction = async (req, res, next) => {
     if (password == cpassword) {
       await userModelSchema.findOneAndUpdate(
         { _id: id },
-        { $set: { password: password } },
+        { $set: { password: hashedPassword } },
         { new: true }
       );
       return res.status(200).json({
@@ -114,16 +108,9 @@ const newPasswordAction = async (req, res, next) => {
     });
   }
 };
-
 module.exports = {
   signup,
-  forgotPasswordAction,
+  forgotPassword,
+  verifyLink,
   newPassword,
-  newPasswordAction,
 };
-
-
-
-
-
-

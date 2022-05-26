@@ -1,16 +1,16 @@
 const express = require("express");
 const {
-  forgotPasswordAction,
+  forgotPassword,
   newPassword,
-  newPasswordAction,
   signup,
+  verifyLink,
 } = require("../../controllers/auth");
 const authRouter = express.Router();
 
-authRouter.post("/register", signup);
-authRouter.post("/forgotPassword", forgotPasswordAction);
+authRouter.post("/signup", signup);
+authRouter.post("/forgotPassword", forgotPassword);
 // new password
-authRouter.get("/newpassword/:id/:token", newPassword);
-authRouter.post("/newpassword/:id/:token", newPasswordAction);
+authRouter.get("/newpassword/:id/:token", verifyLink);
+authRouter.post("/newpassword/:id/:token", newPassword);
 
 module.exports = authRouter;
