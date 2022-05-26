@@ -21,6 +21,3 @@ mongoose
   .catch(console.log);
 
 module.exports = app;
-
-
-
