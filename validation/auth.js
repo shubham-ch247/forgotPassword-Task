@@ -1,5 +1,4 @@
 const { body } = require("express-validator");
-//const userModelSchema = require("../model/user");
 
 const forgotValidation = [
   body("password")
@@ -7,7 +6,7 @@ const forgotValidation = [
     .notEmpty()
     .withMessage("Please enter password.")
     .isLength({ min: 8 })
-    .withMessage("Password must be at least 6 character long.")
+    .withMessage("Password must be at least 8 character long.")
     .not()
     .matches(/^$|\s+/)
     .withMessage("White space not allowed"),
