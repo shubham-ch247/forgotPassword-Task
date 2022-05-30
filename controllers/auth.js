@@ -3,9 +3,9 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { Email } = require("../utils/Email");
 //signup user
-const signup = async (req, res) => {
+const signup = async (req, res ) => {
   try {
-    const { firstName, lastName, email, password } = req.body;
+    const { firstName, lastName, email, password} = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await userModelSchema.findOne({ email: email });
     if (user) {
@@ -13,7 +13,7 @@ const signup = async (req, res) => {
         message: "email already exist!",
       });
     }
-    const newUser = await userModelSchema.create({firstName,lastName,email,password: hashedPassword,});
+    const newUser = await userModelSchema.create({firstName,lastName,email,password:hashedPassword});
     return res.status(200).json({
       registerUser: newUser,
     });
