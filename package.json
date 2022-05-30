@@ -1,7 +1,6 @@
 {
   "name": "drive",
   "version": "1.0.0",
-  "description": "",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
@@ -12,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "@handlebars/allow-prototype-access": "^1.0.5",
+    "bcrypt": "^5.0.1",
     "body-parser": "^1.19.2",
     "connect-flash": "^0.1.1",
     "dotenv": "^16.0.0",
@@ -28,5 +28,14 @@
     "nodemon": "^2.0.15",
     "stripe": "^8.209.0",
     "url-metadata": "^2.5.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shubham-ch247/forgotPassword-Task.git"
+  },
+  "bugs": {
+    "url": "https://github.com/shubham-ch247/forgotPassword-Task/issues"
+  },
+  "homepage": "https://github.com/shubham-ch247/forgotPassword-Task#readme",
+  "description": ""
 }
